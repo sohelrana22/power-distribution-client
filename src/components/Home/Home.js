@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, } from 'react-bootstrap'
 import axios from 'axios'
+import Pagination from '../Pagination/Pagination';
+import Header from '../Header/Header';
 
-const Employee = () => {
+const User = () => {
     const [Data, setData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [postsPerPage] = useState(10);
     const [filterVal, setFilterVal] = useState("");
     const [searchData, setSearchData] = useState([]);
     const [RowData, SetRowData] = useState([])
@@ -119,24 +123,36 @@ const Employee = () => {
         if(e.target.value == '') {
             setData(searchData)
         } else {
-         const filterResult = searchData.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase()) || item.email.toLowerCase().includes(e.target.value.toLowerCase()) || item.number.toLowerCase().includes(e.target.value.toLowerCase()) || item.amount.toLowerCase().includes(e.target.value.toLowerCase()))
-         setData(filterResult)
+         const filterResult = searchData.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase()) || item.email.toLowerCase().includes(e.target.value.toLowerCase()) || item.number.toLowerCase().includes(e.target.value.toLowerCase()))
+         if(filterResult.length > 0) {
+            setData(filterResult)
+         } else {
+            setData([{"name": "No Data Found"}])
+         }
+        
         }
         setFilterVal(e.target.value)
     }
+    const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = Data.slice(indexOfFirstPost, indexOfLastPost);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
     return (
-        <div className='container'>
-            <div style={{margin: '10px 10%'}}>
-            <div className='input-search'>
-            <input placeholder='Search' value={filterVal} onInput={(e) => handleFilter(e)}/>
-            </div>
-            </div>
+        <div>
+            <Header currentPosts={currentPosts}></Header>
+            <div className='container'>
             <div className='row'>
-                <div className='mt-5 mb-4'>
+                <div className='mt-3 mb-3 d-flex justify-content-between'>
+                    <h1>Billings</h1>
+                <div  className='mt-3 mb-3 search'>
+                 <input placeholder='Search' value={filterVal} onInput={(e) => handleFilter(e)}/>
+            </div>
                     <Button variant='primary' onClick={() => { handlePostShow() }}><i className='fa fa-plu'></i>
                         Add New Bill
-                    </Button>
-                </div>
+                    </Button>  
+            </div>  
             </div>
             <div className='row'>
                 <div className='table-responsive'>
@@ -152,23 +168,28 @@ const Employee = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {Data.map((item) =>
-                                <tr key={item._id}>
-                                    <td>{item._id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.email}</td>
-                                    <td>{item.number}</td>
-                                    <td>{item.amount}</td>
+                            {currentPosts.map((index) =>
+                                <tr key={index._id}>
+                                    <td>{index._id}</td>
+                                    <td>{index.name}</td>
+                                    <td>{index.email}</td>
+                                    <td>{index.number}</td>
+                                    <td>{index.amount}</td>
                                     <td style={{ minWidth: 190 }}>
-                                        <Button size='sm' variant='primary' onClick={() => { handleViewShow(SetRowData(item)) }}>View</Button>|
-                                        <Button size='sm' variant='warning' onClick={()=> {handleEditShow(SetRowData(item),setId(item._id))}}>Edit</Button>|
-                                        <Button size='sm' variant='danger' onClick={() => {handleViewShow(SetRowData(item),setId(item._id), setDelete(true))}}>Delete</Button>|
+                                        <Button size='sm' variant='primary' onClick={() => { handleViewShow(SetRowData(index)) }}>View</Button>|
+                                        <Button size='sm' variant='warning' onClick={()=> {handleEditShow(SetRowData(index),setId(index._id))}}>Edit</Button>|
+                                        <Button size='sm' variant='danger' onClick={() => {handleViewShow(SetRowData(index),setId(index._id), setDelete(true))}}>Delete</Button>|
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
+                <Pagination
+        postsPerPage={postsPerPage}
+        totalPosts={Data.length}
+        paginate={paginate}
+      />
             </div>
             {/* View Modal */}
             <div className='model-box-view'>
@@ -277,8 +298,10 @@ const Employee = () => {
                     </Modal.Footer>
                 </Modal>
             </div>
+            
+        </div>
         </div>
     );
 };
 
-export default Employee;
+export default User;

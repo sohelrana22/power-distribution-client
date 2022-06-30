@@ -1,6 +1,6 @@
-.input-search{
-    margin-bottom: 20px;
+.search{
+    text-align: center;
 }
-.input-search input{
-    padding: 10px;
+.search input{
+    width: 100%;
 }

@@ -4,8 +4,8 @@ import axios from 'axios'
 import Pagination from '../Pagination/Pagination';
 import Header from '../Header/Header';
 
-const User = () => {
-    const [Data, setData] = useState([]);
+const Bill = () => {
+    const [Bill, setBill] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [postsPerPage] = useState(10);
     const [filterVal, setFilterVal] = useState("");
@@ -22,7 +22,9 @@ const User = () => {
     const [ViewDelete, SetDeleteShow] = useState(false)
     const handleDeleteShow = () => { SetDeleteShow(true) }
     const hanldeDeleteClose = () => { SetDeleteShow(false) }
-    //FOr Add New Data Model
+    console.log(ViewDelete, handleDeleteShow, hanldeDeleteClose);
+
+    //For Add New Data Model
     const [ViewPost, SetPostShow] = useState(false)
     const handlePostShow = () => { SetPostShow(true) }
     const hanldePostClose = () => { SetPostShow(false) }
@@ -38,7 +40,7 @@ const User = () => {
     const [id,setId] = useState("");
     const GetEmployeeData = () => {
         //here we will get all employee data
-        const url = 'http://localhost:8000/user'
+        const url = 'http://localhost:8000/api/billing-list'
         axios.get(url)
             .then(response => {
                 const result = response.data;
@@ -47,7 +49,7 @@ const User = () => {
                     alert(message, status)
                 }
                 else {
-                    setData(data)
+                    setBill(data)
                     console.log(data)
                     setSearchData(data)
                 }
@@ -57,12 +59,12 @@ const User = () => {
             })
     }
     const handleSubmite = () => {
-        const url = 'http://localhost:8000/user'
+        const url = 'http://localhost:8000/api/add-billing'
         const Credentials = { name, email, number, amount }
         axios.post(url, Credentials)
             .then(response => {
                 const result = response.data;
-                const { status, message, data } = result;
+                const { status, message } = result;
                 if (status !== 'SUCCESS') {
                     alert(message, status)
                 }
@@ -76,7 +78,7 @@ const User = () => {
             })
     }
     const handleEdit = () =>{
-        const url = `http://localhost:8000/user/${id}`
+        const url = `http://localhost:8000/api/update-billing/${id}`
         const Credentials = { name, email, number, amount }
         axios.put(url, Credentials)
             .then(response => {
@@ -96,7 +98,7 @@ const User = () => {
     }
     //handle Delete Function 
     const handleDelete = () =>{
-        const url = `http://localhost:8000/user/${id}`
+        const url = `http://localhost:8000/api/delete-billing/${id}`
         axios.delete(url)
             .then(response => {
                 const result = response.data;
@@ -120,14 +122,14 @@ const User = () => {
     }, [])
 
     const handleFilter =(e) => {
-        if(e.target.value == '') {
-            setData(searchData)
+        if(e.target.value === '') {
+            setBill(searchData)
         } else {
          const filterResult = searchData.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase()) || item.email.toLowerCase().includes(e.target.value.toLowerCase()) || item.number.toLowerCase().includes(e.target.value.toLowerCase()))
          if(filterResult.length > 0) {
-            setData(filterResult)
+            setBill(filterResult)
          } else {
-            setData([{"name": "No Data Found"}])
+            setBill([{"name": "No Data Found"}])
          }
         
         }
@@ -135,13 +137,13 @@ const User = () => {
     }
     const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = Data.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = Bill.slice(indexOfFirstPost, indexOfLastPost);
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
     return (
         <div>
-            <Header currentPosts={currentPosts}></Header>
+            <Header Bill={Bill}></Header>
             <div className='container'>
             <div className='row'>
                 <div className='mt-3 mb-3 d-flex justify-content-between'>
@@ -187,7 +189,7 @@ const User = () => {
                 </div>
                 <Pagination
         postsPerPage={postsPerPage}
-        totalPosts={Data.length}
+        totalPosts={Bill.length}
         paginate={paginate}
       />
             </div>
@@ -304,4 +306,4 @@ const User = () => {
     );
 };
 
-export default User;
+export default Bill;
